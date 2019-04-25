@@ -57,11 +57,11 @@ export default class PDFTool extends Component {
       Promise.all(Array.from({ length: pdf.numPages }).map((v, i) => {
         return pdf.getPage(i + 1)
       })).then((pages) => {
-        const group = {
-          pages: [0, 1],
-          annotations: [],
-          rotations: [0, 0]
-        }
+        // const group = {
+        //   pages: [0, 1],
+        //   annotations: [],
+        //   rotations: [0, 0]
+        // }
         this.setState({
           selectedPages: [],
           groups: [],
@@ -239,8 +239,8 @@ export default class PDFTool extends Component {
           </div>
         }
         {this.state.groups.map((group, i) => (
-          <div className='mb3'>
-            <div key={i} className='pa3 bg-washed-green br2 ba b--light-green dib'>
+          <div key={i} className='mb3'>
+            <div className='pa3 bg-washed-green br2 ba b--light-green dib'>
               {this.props.actions && this.props.actions(group)}
               {/* <p>{pageRange(group)}</p> */}
               {group.pages.map((page, j) => (
@@ -287,7 +287,7 @@ export default class PDFTool extends Component {
               <div className='dropdown-menu'>
                 <div className='dropdown-content'>
                   {this.state.groups.map((group, i) => (
-                    <a href='' className='dropdown-item' key={i} onClick={(e) =>{ e.preventDefault(); this.addToGroup(i)}}>{pageRange(group)}</a>
+                    <a href='#1' className='dropdown-item' key={i} onClick={(e) =>{ e.preventDefault(); this.addToGroup(i)}}>{pageRange(group)}</a>
                   ))}
                 </div>
               </div>

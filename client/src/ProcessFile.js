@@ -19,10 +19,16 @@ export default class ProcessFile extends Component {
 
   onFileChange = (files) => {
     const file = files[0];
-    this.setState({
-      file,
-      active: false
-    });
+    if (file.type !== 'application/pdf'){
+      this.setState({
+        error: 'please upload a PDF file'
+      });
+    } else {
+      this.setState({
+        file,
+        active: false
+      });
+    }
   }
 
   updateMessage(message) {
@@ -57,7 +63,7 @@ export default class ProcessFile extends Component {
           }).catch((error) => {
             console.log(error)
             this.setState({
-              error,
+              error: 'Something went wrong',
               loading: false
             })
           })
@@ -107,9 +113,9 @@ export default class ProcessFile extends Component {
             <div className='loader ml3 is-primary is-large'></div>
           }
         </div>
-        {/* {this.state.error &&
+        {this.state.error &&
           <p>{this.state.error}</p>
-        } */}
+        }
         {this.state.message &&
           <p>{this.state.message}</p>
         }
