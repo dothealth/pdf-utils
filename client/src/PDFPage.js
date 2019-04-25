@@ -42,8 +42,8 @@ export default class PDFPage extends Component {
         onClick={this.props.onClick}
         className='dib relative pdf-page mr1 mb1 ba b--light-silver'
       >
-        {this.props.selected && <div className='pdf-highlight'></div> }
-        {this.props.grouped && <div className='pdf-disabled'></div> }
+        {this.props.selected && <div className='pdf-highlight bg-light-yellow'></div> }
+        {this.props.grouped && <div className='pdf-disabled bg-light-green'></div> }
         {!isNaN(this.props.index) &&
           <div className='pdf-meta'><span className='ma2'>{this.props.index + 1}</span></div>
         }

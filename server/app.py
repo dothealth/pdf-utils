@@ -78,6 +78,31 @@ def process_hocr_pdf(savepath, bind=True):
             return { 'output': outputfilename }
 
 
+@app.route('/split_pdf', methods=['POST'])
+def split_pdf():
+    if 'file' not in request.files:
+        print('No file was provided\n')
+        return 'No file was provided.', 400
+
+    inputfile = request.files['file']
+    filename, filetype = os.path.splitext(inputfile.filename)
+    page_arg = request.args.get('pages')
+
+    with tempfile.TemporaryDirectory() as path:
+        savepath = os.path.join(path, inputfile.filename)
+        inputfile.save(savepath)
+        pages = ['A' + page for page in page_arg.split(',')]
+        outputfile = os.path.join(path, filename + '_' + page_arg + '.pdf')
+        subprocess.call(['pdftk', 'A=' + savepath, 'cat'] + pages + ['output', outputfile])
+        with open(outputfile, 'rb') as data:
+            resp = io.BytesIO(data.read())
+            return send_file(
+                resp,
+                attachment_filename=filename,
+                mimetype='application/pdf'
+            )
+
+
 @app.route('/hocr_pdf', methods=['POST'])
 def make_rich_pdf():
     if 'file' not in request.files:

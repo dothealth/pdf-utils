@@ -28,7 +28,7 @@ export default class PDFTool extends Component {
   }
 
   componentDidMount() {
-    this.setState({file: 'multipage.pdf'});
+    // this.setState({file: 'multipage.pdf'});
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -57,6 +57,11 @@ export default class PDFTool extends Component {
       Promise.all(Array.from({ length: pdf.numPages }).map((v, i) => {
         return pdf.getPage(i + 1)
       })).then((pages) => {
+        const group = {
+          pages: [0, 1],
+          annotations: [],
+          rotations: [0, 0]
+        }
         this.setState({
           selectedPages: [],
           groups: [],
@@ -234,51 +239,73 @@ export default class PDFTool extends Component {
           </div>
         }
         {this.state.groups.map((group, i) => (
-          <div key={i}>
-            <p>{pageRange(group)}</p>
-            {group.pages.map((page, j) => (
-              <PDFPage
-                key={this.state.pages[page].pageIndex}
-                index={this.state.pages[page].pageIndex}
-                page={this.state.pages[page]}
-                rotation={group.rotations[j]}
-              >
-                <div>
-                  <button onClick={(e) => {
-                    this.rotatePageInGroup(i, j)
-                    e.stopPropagation();
-                  }}>rotate</button>
-                  <button onClick={(e) => {
-                    this.removePageFromGroup(i, j)
-                    e.stopPropagation();
-                  }}>remove</button>
-                  <button onClick={(e) => {
-                    this.setState({ magnifiedPage: this.state.pages[page] })
-                    e.stopPropagation();
-                  }}>magnify</button>
-                </div>
-              </PDFPage>
-            ))}
+          <div className='mb3'>
+            <div key={i} className='pa3 bg-washed-green br2 ba b--light-green dib'>
+              {this.props.actions && this.props.actions(group)}
+              {/* <p>{pageRange(group)}</p> */}
+              {group.pages.map((page, j) => (
+                <PDFPage
+                  key={this.state.pages[page].pageIndex}
+                  index={this.state.pages[page].pageIndex}
+                  page={this.state.pages[page]}
+                  rotation={group.rotations[j]}
+                >
+                  <div>
+                    <button className='button' onClick={(e) => {
+                      this.rotatePageInGroup(i, j)
+                      e.stopPropagation();
+                    }}><span className='icon is-small'><i className='fa fa-sync' /></span></button>
+                    <button className='button' onClick={(e) => {
+                      this.removePageFromGroup(i, j)
+                      e.stopPropagation();
+                    }}><span className='icon is-small'><i className='fa fa-times-circle' /></span></button>
+                    <button className='button' onClick={(e) => {
+                      this.setState({ magnifiedPage: this.state.pages[page] })
+                      e.stopPropagation();
+                    }}><span className='icon is-small'><i className='fa fa-search-plus' /></span></button>
+                  </div>
+                </PDFPage>
+              ))}
+            </div>
           </div>
         ))}
-        <div className='toolbar'>
-          <button disabled={this.state.selectedPages.length === 0} onClick={this.createGroup}>Create group</button>
-          <div>
-            <button
-              disabled={this.state.selectedPages.length === 0 || this.state.groups.length === 0}
-              onClick={() => { this.setState({ groupsDropdown: !this.state.groupsDropdown }) }}>
-                Add to group
-            </button>
-            {this.state.groupsDropdown &&
-              <div>
-                {this.state.groups.map((group, i) => (
-                  <button onClick={() => this.addToGroup(i)}>{pageRange(group)}</button>
-                ))}
+        <div className='flex'>
+          <div className='toolbar flex field has-addons'>
+            <div className='control'>
+              <button className='button' disabled={this.state.selectedPages.length === 0} onClick={this.createGroup}>Create group</button>
+            </div>
+            <div className={`control dropdown ${this.state.groupsDropdown && 'is-active'}`}>
+              <div className='dropdown-trigger'>
+                <button
+                  className='button'
+                  disabled={this.state.selectedPages.length === 0 || this.state.groups.length === 0}
+                  onClick={() => { this.setState({ groupsDropdown: !this.state.groupsDropdown }) }}>
+                    <span>Add to group</span>
+                    <span className='icon is-small'><i className='fas fa-angle-down' /></span>
+                </button>
               </div>
-            }
+              <div className='dropdown-menu'>
+                <div className='dropdown-content'>
+                  {this.state.groups.map((group, i) => (
+                    <a href='' className='dropdown-item' key={i} onClick={(e) =>{ e.preventDefault(); this.addToGroup(i)}}>{pageRange(group)}</a>
+                  ))}
+                </div>
+              </div>
+            </div>
+            <div className='control'>
+              <button className='button' disabled={this.state.groups.length === 0} onClick={this.selectRemaining}>Select remaining</button>
+            </div>
           </div>
-          <button disabled={this.state.groups.length === 0} onClick={() => { this.setState({ showSelected: !this.state.showSelected }) }}>Hide selected</button>
-          <button disabled={this.state.groups.length === 0} onClick={this.selectRemaining}>Select remaining</button>
+          <div className='ml2'>
+            <label className='checkbox' disabled={this.state.groups.length === 0}>
+              <input
+                type='checkbox'
+                disabled={this.state.groups.length === 0}
+                onChange={() => {this.setState({ showSelected: !this.state.showSelected })} }
+                checked={!this.state.showSelected} />
+              <span className='pl2'>Hide selected</span>
+            </label>
+          </div>
         </div>
          {this.state.pages.map((page, i) => ((this.state.showSelected || !grouped.includes(page.pageIndex)) &&
             <div className='dib' key={i}>
@@ -292,14 +319,14 @@ export default class PDFTool extends Component {
                 deleted={this.state.deleted.includes(page.pageIndex)}
               >
                 <div>
-                  <button onClick={(e) => {
+                  <button className='button' onClick={(e) => {
                     this.deletePage(page)
                     e.stopPropagation();
-                   }}>delete</button>
-                  <button onClick={(e) => {
+                  }}><span className='icon is-small'><i className='fa fa-trash' /></span></button>
+                  <button className='button' onClick={(e) => {
                     this.setState({ magnifiedPage: page })
                     e.stopPropagation();
-                  }}>magnify</button>
+                  }}><span className='icon is-small'><i className='fa fa-search-plus' /></span></button>
                 </div>
               </PDFPage>
             </div>

@@ -25,7 +25,7 @@ export function download(url, options = {}) {
   })
 }
 
-export function upload(url, file, data={}) {
+export function upload(url, file, data={}, blob = false) {
   return new Promise((resolve, reject) => {
     const formData = new FormData();
     const xhr = new XMLHttpRequest();
@@ -35,7 +35,9 @@ export function upload(url, file, data={}) {
     });
 
     formData.append('file', file, file.name);
-    // xhr.responseType = 'blob';
+    if (blob) {
+      xhr.responseType = 'blob';
+    }
     xhr.onreadystatechange = () => {
       if (xhr.readyState === 4) {
         if (xhr.status >= 200 && xhr.status < 300) {

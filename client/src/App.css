@@ -37,7 +37,6 @@
 }
 
 .pdf-disabled {
-  background-color:#8285A4;
   opacity: 0.6;
   position: absolute;
   left: 0;
@@ -47,7 +46,6 @@
 }
 
 .pdf-highlight {
-  background-color: #EFC11E;
   opacity: 0.3;
   position: absolute;
   left: 0;
