@@ -1,0 +1,31 @@
+version: '2'
+services:
+  server:
+    build: ./server
+    container_name: 'pdfutils_server'
+    volumes:
+      - ./server/:/app
+    ports:
+      - "5051:5051"
+    links:
+      - redis
+  client:
+    build: ./client
+    container_name: 'pdfutils_client'
+    volumes:
+      - './client:/usr/src/app'
+      - '/usr/src/app/node_modules'
+    ports:
+      - "5052:3000"
+    environment:
+      - SERVER_HOST=server
+      - NODE_ENV=development
+  redis:
+    image: "redis:latest"
+  celery:
+    build: ./server
+    volumes:
+      - ./server/:/app
+    command: celery -A app.celery worker --loglevel=info
+    links:
+      - redis
